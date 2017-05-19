@@ -34,10 +34,11 @@ class AuthServer(object):
             connection, clientinfo = sock.accept()
             sys.stderr.write("%s: new connection" % clientinfo)
             try:
-                data = connection.recv(256)
+                data = connection.recv(1024)
                 if not data:
                     sys.stderr.write("%s: zero data received" % clientinfo)
-                if data[0] == '0':
+                data = yaml.safe_load(data)
+                if data["request"] == "by_username":
                     user = data[1:]
                     try:
                         pwnam = pwd.getpwnam(user)
@@ -46,13 +47,11 @@ class AuthServer(object):
                             "pwnam": pwnam,
                             "grp": grp.getgrall(),
                         }
-                        connection.sendall(yaml.dump(pwinfo))
+                        connection.sendall(bytearray(yaml.dump(pwinfo), "ascii"))
                     except KeyError:
-                        connection.sendall(yaml.dump({"response": "notfound"}))
+                        connection.sendall(bytearray(yaml.dump({"response": "notfound"}), "ascii"))
                 else:
-                    sys.stderr.write("%s: unknown command %r received" % (clientinfo, data[0]))
-                if data:
-                    connection.sendall(data)
+                    sys.stderr.write("%s: unknown command %r received" % (clientinfo, data["request"]))
             except Exception as e:
                 sys.stderr.write("%s: exception: %s" % (clientinfo, e))
             connection.close()

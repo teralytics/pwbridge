@@ -19,7 +19,7 @@ class AuthClient(object):
         sock.connect(self.socketpath)
         try:
             data = {"request": "by_username", "username": username}
-            sock.sendall(yaml.safe_dump(data))
+            sock.sendall(bytearray(yaml.safe_dump(data), "ascii"))
             sock.shutdown(socket.SHUT_WR)
             resp = sock.recv(1048576)
             resp = yaml.load(resp) # FIXME: use safe_load, requires server changes.
