@@ -17,7 +17,7 @@ class AuthServer(object):
                 raise
 
         try:
-            os.mkdir(os.path.dirname(socketpath), 0700)
+            os.mkdir(os.path.dirname(socketpath))
         except (IOError, OSError) as e:
             if e.errno != errno.EEXIST:
                 raise
