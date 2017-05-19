@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import cPickle as pickle
 import os
 import socket
@@ -33,4 +35,4 @@ class AuthClient(object):
 
 if __name__ == "__main__":
     s = AuthClient(sys.argv[1])
-    print s.by_username(os.environ["USER"])
+    print(s.by_username(os.environ["USER"]))
