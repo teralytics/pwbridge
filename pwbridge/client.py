@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import cPickle as pickle
+import pickle
 import os
 import socket
 import sys
