@@ -30,9 +30,7 @@ class AuthClient(object):
             if resp["response"] == "notfound":
                 # User does not exist.
                 return None
-            grp = resp['grp']
-            groups = dict((gn.gr_gid, gn.gr_name) for gn in grp if gn.gr_gid == resp["gid"])
-            return resp["gecos"], resp["uid"], resp["gid"], groups
+            return resp["gecos"], resp["uid"], resp["gid"], resp['grp']
         finally:
             sock.close()
 

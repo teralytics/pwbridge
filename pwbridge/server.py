@@ -3,6 +3,7 @@ import grp
 import os
 import pwd
 import socket
+import subprocess
 import sys
 import yaml
 
@@ -42,12 +43,14 @@ class AuthServer(object):
                     user = data["username"]
                     try:
                         pwnam = pwd.getpwnam(user)
+                        grps = subprocess.check_output(["id", "-Gn", "--", user])
+                        grps = dict((grp.getgrnam(g).gr_gid, g) for g in grps.strip().split())
                         pwinfo = {
                             "response": "found",
                             "gecos": pwnam.pw_gecos,
                             "uid": pwnam.pw_uid,
                             "gid": pwnam.pw_gid,
-                            "grp": grp.getgrall(),
+                            "grp": grps,
                         }
                         # FIXME: use safe_dump, requires changes here and in the client.
                         connection.sendall(bytearray(yaml.dump(pwinfo), "ascii"))
