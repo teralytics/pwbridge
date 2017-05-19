@@ -1,10 +1,10 @@
-import pickle
 import errno
 import grp
 import os
 import pwd
 import socket
 import sys
+import yaml
 
 
 class AuthServer(object):
@@ -42,12 +42,13 @@ class AuthServer(object):
                     try:
                         pwnam = pwd.getpwnam(user)
                         pwinfo = {
+                            "response": "found",
                             "pwnam": pwnam,
-                            "grp": grp.getgrall()
+                            "grp": grp.getgrall(),
                         }
-                        connection.sendall('0' + pickle.dumps(pwinfo))
+                        connection.sendall(yaml.dump(pwinfo))
                     except KeyError:
-                        connection.sendall('1')
+                        connection.sendall(yaml.dump({"response": "notfound"}))
                 else:
                     sys.stderr.write("%s: unknown command %r received" % (clientinfo, data[0]))
                 if data:

@@ -1,9 +1,9 @@
 from __future__ import print_function
 
-import pickle
 import os
 import socket
 import sys
+import yaml
 
 
 class AuthClient(object):
@@ -18,15 +18,16 @@ class AuthClient(object):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(self.socketpath)
         try:
-            data = bytearray('0' + username, "utf-8")
-            sock.sendall(data)
+            data = {"request": "by_username", "username": username}
+            sock.sendall(yaml.safe_dump(data))
+            sock.shutdown(socket.SHUT_WR)
             resp = sock.recv(1048576)
-            if resp[0] == "1":
+            resp = yaml.load(resp) # FIXME: use safe_load, requires server changes.
+            if resp["response"] == "notfound":
                 # User does not exist.
                 return None
-            pwinfo = pickle.loads(bytearray(resp[1:], "utf-8"))
-            pwnam = pwinfo['pwnam']
-            grp = pwinfo['grp']
+            pwnam = resp["pwnam"]
+            grp = resp['grp']
             groups = dict((gn.gr_gid, gn.gr_name) for gn in grp if gn.gr_gid == pwnam.pw_gid)
             return pwnam.pw_gecos, pwnam.pw_uid, pwnam.pw_gid, groups
         finally:
