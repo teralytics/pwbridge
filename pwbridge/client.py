@@ -24,7 +24,7 @@ class AuthClient(object):
             if resp[0] == "1":
                 # User does not exist.
                 return None
-            pwinfo = pickle.loads(bytearray(resp[1:]))
+            pwinfo = pickle.loads(bytearray(resp[1:], "utf-8"))
             pwnam = pwinfo['pwnam']
             grp = pwinfo['grp']
             groups = dict((gn.gr_gid, gn.gr_name) for gn in grp if gn.gr_gid == pwnam.pw_gid)
