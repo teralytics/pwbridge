@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='pwbridge',
-    version='0.0.12',
+    version='0.0.13',
     description='UNIX-like users and groups info service via a local socket',
     author='Manuel Amador',
     author_email='manuel.amador@teralytics.net',

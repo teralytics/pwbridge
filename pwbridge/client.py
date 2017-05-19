@@ -1,9 +1,11 @@
 from __future__ import print_function
 
-import os
 import socket
 import sys
 import yaml
+
+
+class ProtocolError(Exception): pass
 
 
 class AuthClient(object):
@@ -22,14 +24,15 @@ class AuthClient(object):
             sock.sendall(bytearray(yaml.safe_dump(data), "ascii"))
             sock.shutdown(socket.SHUT_WR)
             resp = sock.recv(1048576)
+            if not resp:
+                raise ProtocolError("server response was empty")
             resp = yaml.load(resp) # FIXME: use safe_load, requires server changes.
             if resp["response"] == "notfound":
                 # User does not exist.
                 return None
-            pwnam = resp["pwnam"]
             grp = resp['grp']
-            groups = dict((gn.gr_gid, gn.gr_name) for gn in grp if gn.gr_gid == pwnam.pw_gid)
-            return pwnam.pw_gecos, pwnam.pw_uid, pwnam.pw_gid, groups
+            groups = dict((gn.gr_gid, gn.gr_name) for gn in grp if gn.gr_gid == resp["gid"])
+            return resp["gecos"], resp["uid"], resp["gid"], groups
         finally:
             sock.close()
 
