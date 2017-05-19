@@ -18,7 +18,7 @@ class AuthClient(object):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(self.socketpath)
         try:
-            data = '0' + username
+            data = bytearray('0' + username)
             sock.sendall(data)
             resp = sock.recv(1048576)
             if resp[0] == "1":
