@@ -36,4 +36,4 @@ class AuthClient(object):
 
 if __name__ == "__main__":
     s = AuthClient(sys.argv[1])
-    print(s.by_username(os.environ["USER"]))
+    print(s.by_username(sys.argv[2]))
