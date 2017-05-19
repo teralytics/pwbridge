@@ -31,11 +31,12 @@ class AuthServer(object):
         sock.listen(1)
 
         while True:
-            # Wait for a connection
-            connection, client_address = sock.accept()
+            connection, clientinfo = sock.accept()
+            sys.stderr.write("%s: new connection" % clientinfo)
             try:
-                # Receive the data in small chunks and retransmit it
                 data = connection.recv(256)
+                if not data:
+                    sys.stderr.write("%s: zero data received" % clientinfo)
                 if data[0] == '0':
                     user = data[1:]
                     try:
@@ -48,12 +49,12 @@ class AuthServer(object):
                     except KeyError:
                         connection.sendall('1')
                 else:
-                    sys.stderr.write("Unknown command %s" % data[0])
+                    sys.stderr.write("%s: unknown command %r received" % (clientinfo, data[0]))
                 if data:
                     connection.sendall(data)
-            finally:
-                # Clean up the connection
-                connection.close()
+            except Exception as e:
+                sys.stderr.write("%s: exception: %s" % (clientinfo, e))
+            connection.close()
 
 
 if __name__ == "__main__":
